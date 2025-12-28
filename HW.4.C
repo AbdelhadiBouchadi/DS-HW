@@ -1,101 +1,71 @@
+// MAX / MIN HEAP
+
 #include <stdio.h>
-#include <stdlib.h>
 
-// Structure for Doubly Linked List node
-struct Box {
-    int val;
-    struct Box* next;
-    struct Box* prev;
-};
-
-// Function to add item at the end
-void append(struct Box** head, struct Box** tail, int data) {
-    struct Box* newBox = (struct Box*)malloc(sizeof(struct Box));
-    newBox->val = data;
-    newBox->next = NULL;
-    newBox->prev = NULL;
-
-    if (*head == NULL) {
-        *head = newBox;
-        *tail = newBox;
-        return;
-    }
-
-    (*tail)->next = newBox;
-    newBox->prev = *tail;
-    *tail = newBox;
+void swap_elements(int *x, int *y)
+{
+    int t = *x;
+    *x = *y;
+    *y = t;
 }
 
-// Function to delete the list (Recursion style)
-void clearAll(struct Box* head) {
-    if (head == NULL) return;
-    clearAll(head->next);
-    free(head);
+void max_h(int a[], int n, int i)
+{
+    int big = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && a[l] > a[big])
+        big = l;
+    if (r < n && a[r] > a[big])
+        big = r;
+
+    if (big != i)
+    {
+        swap_elements(&a[i], &a[big]);
+        max_h(a, n, big);
+    }
 }
 
-// Function to add at a specific place
-void addAt(struct Box** head, struct Box** tail, int data, int pos) {
-    struct Box* newBox = (struct Box*)malloc(sizeof(struct Box));
-    newBox->val = data;
-    newBox->next = NULL;
-    newBox->prev = NULL;
+void min_h(int a[], int n, int i)
+{
+    int small = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
 
-    if (pos == 0) {
-        newBox->next = *head;
-        if (*head != NULL) (*head)->prev = newBox;
-        *head = newBox;
-        if (*tail == NULL) *tail = newBox;
-        return;
+    if (l < n && a[l] < a[small])
+        small = l;
+    if (r < n && a[r] < a[small])
+        small = r;
+
+    if (small != i)
+    {
+        swap_elements(&a[i], &a[small]);
+        min_h(a, n, small);
     }
-
-    struct Box* curr = *head;
-    for (int i = 0; i < pos - 1 && curr != NULL; i++) {
-        curr = curr->next;
-    }
-
-    if (curr == NULL) {
-        printf("Out of range\n");
-        free(newBox);
-        return;
-    }
-
-    newBox->next = curr->next;
-    newBox->prev = curr;
-
-    if (curr->next != NULL)
-        curr->next->prev = newBox;
-    else
-        *tail = newBox;
-
-    curr->next = newBox;
 }
 
-int main() {
-    struct Box* h = NULL;
-    struct Box* t = NULL;
+int main()
+{
+    int arr1[] = {12, 11, 13, 5, 6, 7};
+    int size = 6;
 
-    append(&h, &t, 10);
-    append(&h, &t, 20);
-    addAt(&h, &t, 15, 1);
+    for (int i = size / 2 - 1; i >= 0; i--)
+        max_h(arr1, size, i);
 
-    printf("Forward List: ");
-    struct Box* temp = h;
-    while (temp != NULL) {
-        printf("%d ", temp->val);
-        temp = temp->next;
-    }
+    printf("Max Heap: ");
+    for (int i = 0; i < size; i++)
+        printf("%d ", arr1[i]);
     printf("\n");
 
-    clearAll(h);
-    h = NULL; t = NULL;
+    int arr2[] = {12, 11, 13, 5, 6, 7};
+    for (int i = size / 2 - 1; i >= 0; i--)
+        min_h(arr2, size, i);
+
+    printf("Min Heap: ");
+    for (int i = 0; i < size; i++)
+        printf("%d ", arr2[i]);
+    printf("\n");
 
     return 0;
 }
-
-/*
-   Difference between Circular and Normal Linked List
-  1. Normal ends with NULL, Circular points back to the first node.
-  2. Normal is easy to loop, Circular needs a stop condition to avoid infinite loop.
-  3. Circular is better for things like game turns or buffers.
-  4. Sorting Normal is easier because it has a clear end.
-*/
